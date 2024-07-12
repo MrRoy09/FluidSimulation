@@ -21,3 +21,6 @@ This will generate the required files to setup the project
 </br></br>
 
 <img src = misc/img2.png>
+
+## Note
+Runs on multithreaded mode with 16 different threads. FPS will drop significantly below that.

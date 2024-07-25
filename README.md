@@ -1,6 +1,6 @@
 ## Overview
 
-A fluid simulation written in C++ using SFML by following along <a href="https://www.youtube.com/watch?v=rSKMYc1CQHE&t=2480s">Sebastian Lague's tutorial</a>.
+A fluid simulation written in C++ using SFML based on <a href="https://www.youtube.com/watch?v=rSKMYc1CQHE&t=2480s">Sebastian Lague's tutorial</a>.
 
 ## Steps to build
 

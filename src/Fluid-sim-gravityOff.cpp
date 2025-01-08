@@ -16,17 +16,16 @@ int screen_width = 1280;
 int screen_height = 800;
 bool gravity_on = 0;
 float target_density = 1; // target density when gravity on = 60
-double pressureMultiplier = 20000000; // set to 40000000 when gravity on 20000000 otherwise
+double pressureMultiplier = 12000000; // set to 40000000 when gravity on 12000000 otherwise
 float damping_factor = 0.9;
 float smoothing_radius = 80;
-int num_particles = 2000;
-int number_threads = 16;
+int num_particles;
+int number_threads;
 
 float impact_radius_mouse = 200;
 float impact_radius_mouse2 =150;
-float strength = 20000; // set to 2000 when gravity on
-float strength2 = 20000; // set to 2000 when gravity on
-std::mutex render_mutex;
+float strength = 10000; // set to 2000 when gravity on
+float strength2 = 10000; // set to 2000 when gravity on
 
 
 sf::Color blue = { 2,8,240};
@@ -62,8 +61,7 @@ public:
         this->particle_shape.setFillColor(sf::Color::Blue);
     }
 
-    const void render(sf::RenderWindow &wind) {
-        std::lock_guard<std::mutex> guard(render_mutex);
+    void render(sf::RenderWindow &wind) {
         this->particle_shape.setPosition(this->position-sf::Vector2f(particle_radius,particle_radius));
         wind.draw(this->particle_shape);
        
@@ -296,13 +294,18 @@ static void updateGridCols(Grid& grid1, int col, std::map<int, float>& densities
 
 int main()
 {
+    number_threads = std::thread::hardware_concurrency();
+    if (!number_threads) {
+        number_threads = 4; // a minimum number of threads to spawn
+    }
+    num_particles = number_threads * 200;
     sf::RenderWindow window(sf::VideoMode(screen_width, screen_height), "Fluid Simulation");
     std::random_device rd{};
     std::mt19937 gen{ rd() };
     std::normal_distribution<> d_position{ 300, 250 };
 
 
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(120);
     std::vector <particle> particles;
     sf::Vector2f pressureForce;
     std::map<int, float> densities;

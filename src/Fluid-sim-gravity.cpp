@@ -19,14 +19,13 @@ float target_density = 60; // target density when gravity on = 60
 double pressureMultiplier = 40000000; // set to 40000000 when gravity on 20000000 otherwise
 float damping_factor = 0.9;
 float smoothing_radius = 80;
-int num_particles = 2000;
-int number_threads = 16;
+int num_particles;
+int number_threads;
 
 float impact_radius_mouse = 200;
 float impact_radius_mouse2 =200;
 float strength = 2000; // set to 2000 when gravity on
 float strength2 = 2000; // set to 2000 when gravity on
-std::mutex render_mutex;
 
 
 sf::Color blue = { 2,8,240};
@@ -62,8 +61,7 @@ public:
         this->particle_shape.setFillColor(sf::Color::Blue);
     }
 
-    const void render(sf::RenderWindow &wind) {
-        std::lock_guard<std::mutex> guard(render_mutex);
+    void render(sf::RenderWindow &wind) {
         this->particle_shape.setPosition(this->position-sf::Vector2f(particle_radius,particle_radius));
         wind.draw(this->particle_shape);
        
@@ -300,9 +298,13 @@ int main()
     std::random_device rd{};
     std::mt19937 gen{ rd() };
     std::normal_distribution<> d_position{ 300, 250 };
+    number_threads = std::thread::hardware_concurrency();
+    if (!number_threads) {
+        number_threads = 4; // a minimum number of threads to spawn
+    }
+    num_particles = number_threads * 200;
 
-
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(30);
     std::vector <particle> particles;
     sf::Vector2f pressureForce;
     std::map<int, float> densities;
@@ -316,7 +318,7 @@ int main()
             particles.push_back(std::move((particle(i, d_position(gen), d_position(gen), 0, 0))));
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     while (window.isOpen()) {
         auto start = std::chrono::high_resolution_clock::now();
         std::vector<std::thread> update_density_threads;
@@ -324,14 +326,17 @@ int main()
         float mouse_click_x;
         float mouse_click_y;
         Grid grid1;
-        
+
         sf::Event event;
         window.clear();
         for (particle&particle1 :particles) {
             particle1.boundary_check();
+
             grid1.addParticle(&particle1);
+
             velocities[particle1.id] = particle1.velocity;
             speeds[particle1.id] = magnitude(particle1.velocity);
+
             particle1.render(window);
         }
      

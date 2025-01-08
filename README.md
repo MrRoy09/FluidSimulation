@@ -2,7 +2,11 @@
 
 A fluid simulation written in C++ using SFML based on <a href="https://www.youtube.com/watch?v=rSKMYc1CQHE&t=2480s">Sebastian Lague's tutorial</a>.
 
-## Steps to build
+# Download
+
+To explore the simulation, download the binary from the `release` section.
+
+## Steps to build from source
 
 Use cmake to build project.
 
@@ -14,6 +18,7 @@ cmake ..
 ```
 
 This will generate the required files to setup the project
+Using Clang to compile will dramatically increase speed. The binaries in `Release` have been compiled using Clang++
 
 ## Images
 
@@ -21,6 +26,3 @@ This will generate the required files to setup the project
 </br></br>
 
 <img src = misc/img2.png>
-
-## Note
-Runs on multithreaded mode with 16 different threads. FPS will drop significantly below that.
